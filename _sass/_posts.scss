@@ -25,14 +25,14 @@
 // Blog post or page title
 .page-title,
 .post-title {
-  color: var(--heading-color);
+  color: var(--grey-800);
 }
 .page-title,
 .post-title {
   margin-top: 0;
 }
 .post-title a {
-  color: inherit;
+  color: var(--grey-800);
   text-decoration: none;
 
   &:hover,

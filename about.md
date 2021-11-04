@@ -3,6 +3,8 @@ layout: page
 title: About
 ---
 
-**Not Pure Poole** is a simple, beautiful, and powerful Jekyll theme for blogs. It is built on [Poole](https://github.com/poole/poole) and [Pure](https://purecss.io/).
+My Name is Vlad. 
 
-For more information about Not Pure Poole, please browse the [README](https://github.com/vszhub/not-pure-poole) file.
+I'm Software Engineer, Machine Learning Engineer, Data Engineer, and other types of Engineer.
+
+This is my blog, where I mostly copy/paste stuff from the internet.  
