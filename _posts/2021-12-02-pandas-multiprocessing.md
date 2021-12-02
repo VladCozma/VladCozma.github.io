@@ -14,26 +14,26 @@ Having a (very) large dataframe, one would like to apply a function to one of th
 #### Proposal
 Use multiprocessing to split the work on cpu's.
 
-One way of doing that is using python's `multiprocessing` library.
+One way of doing that is using python's **multiprocessing** library.
 
 #### Description
 
-Using `multiprocessing` library you can create a pool of processes, each of them getting a chunk of work to execute. The processes can be spawned in [3 different ways](https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods). Assuming there is a context that needs to be shared with every process (like a python virtual environment), you should `fork` the main process. You do that at import:
+Using **multiprocessing** library you can create a pool of processes, each of them getting a chunk of work to execute. The processes can be spawned in [3 different ways](https://docs.python.org/3/library/multiprocessing.html#contexts-and-start-methods). Assuming there is a context that needs to be shared with every process (like a python virtual environment), you should **fork** the main process. You do that at import:
 ``` python
 import multiprocessing as mp
 mp.set_start_method("fork")
 ```
-There is, of course, complete documentation of [multiprocessing](https://docs.python.org/3/library/multiprocessing.html), so I'll go directly into implementation. To be able to start splitting processes, you need to create a `Pool` object from `mp`, which will create the, well, pool of processes that can start handling your work.
+There is, of course, complete documentation of [multiprocessing](https://docs.python.org/3/library/multiprocessing.html), so I'll go directly into implementation. To be able to start splitting processes, you need to create a **Pool** object from **mp**, which will create the, well, pool of processes that can start handling your work.
 ```python
 POOLSIZE = mp.cpu_count()
 with mp.Pool(POOLSIZE) as pool:
 ```
-The number of processes is defined by the `POOLSIZE`, which normally should be the number of available CPU's which you get with `mp.cpu_count()`.
-The `pool` object has a number of methods the you can summon. To apply a function to a dataframe `map` is a suitable method, and you can do:
+The number of processes is defined by the **POOLSIZE**, which normally should be the number of available CPU's which you get with **mp.cpu_count()**.
+The **pool** object has a number of methods the you can summon. To apply a function to a dataframe **map** is a suitable method, and you can do:
 ```python
 pool.map(my_function, df[content_col_name])
 ```
-If `my_function` requires fixed keyword arguments, you can pass those either by creating an iterator of the same size as `df`, or use `partial` function tool to map them:
+If **my_function** requires fixed keyword arguments, you can pass those either by creating an iterator of the same size as **df**, or use **partial** function tool to map them:
 ```python
 from functools import partial
 
@@ -44,9 +44,9 @@ mapfunc = partial(
 
 )
 ```
-`mapfunc(text)` is now equivalent with `my_function(text, type="1", arg2=1)`.
+**mapfunc(text)** is now equivalent with **my_function(text, type="1", arg2=1)**.
 
-This `pool.map()` execution with split the dataframe in elements of 1 and send each to process to an available resource, and then collect back the results. To do this there is a quite large processing overhead (PO), so you need a good balance between the benefits of multiprocessing and the work needed to process the results. Therefore a `CHUNKSIZE` is recommended, to split the dataframe in manageable chunks. The choice of CHUNKSIZE is sometimes 'dark arts', but I'm using a 'naive' method of splitting the dataframe equally to the number of CPU's, and then splitting with a factor to normalize any unbalances in the dataframe. ALso, a minimum `CHUNKSIZE` is recommended, in case you dataframe is not large enough. You can then apply the map with this chunk.
+This **pool.map()** execution with split the dataframe in elements of 1 and send each to process to an available resource, and then collect back the results. To do this there is a quite large processing overhead (PO), so you need a good balance between the benefits of multiprocessing and the work needed to process the results. Therefore a **CHUNKSIZE** is recommended, to split the dataframe in manageable chunks. The choice of CHUNKSIZE is sometimes 'dark arts', but I'm using a 'naive' method of splitting the dataframe equally to the number of CPU's, and then splitting with a factor to normalize any unbalances in the dataframe. ALso, a minimum **CHUNKSIZE** is recommended, in case you dataframe is not large enough. You can then apply the map with this chunk.
 ```python
 MIN_CHUNK = 250
 POOL_FACTOR = 12
@@ -58,7 +58,7 @@ with mp.Pool(POOLSIZE) as pool:
     df[content_col_name] = pool.map(my_function, df[content_col_name]), chunksize=CHUNKSIZE)
 ```
 In one of my usecases I chose the above figures, but trial and error could get much better results.
-You will observer that in this case you have no insight in the progress of the execution. You can produce a progress bar with `tqdm` by using `imap` instead of `map`.
+You will observer that in this case you have no insight in the progress of the execution. You can produce a progress bar with **tqdm** by using **imap** instead of **map**.
 ```python
 with mp.Pool(POOLSIZE) as pool:
     df[content_col_name] = list(
